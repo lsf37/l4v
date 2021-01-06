@@ -171,7 +171,6 @@ schematic_goal Z:
     thm H (* bound to match result from bazz (shadows original H) *)
     finish
  oops
- oops
 
 section \<open>Tracing used rules\<close>
 
