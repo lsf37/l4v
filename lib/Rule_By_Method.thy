@@ -10,6 +10,8 @@ imports
   "HOL-Eisbach.Eisbach_Tools"
 begin
 
+print_theorems
+
 ML \<open>
 signature RULE_BY_METHOD =
 sig
