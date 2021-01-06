@@ -14,6 +14,8 @@ keywords "requalify_facts" :: thy_decl and "requalify_types" :: thy_decl and "re
          "global_naming" :: thy_decl
 begin
 
+print_theorems
+
 ML \<open>
 
 local
