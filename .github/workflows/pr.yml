@@ -37,7 +37,7 @@ jobs:
     name: 'Theory Linter'
     runs-on: ubuntu-latest
     steps:
-    - uses: seL4/ci-actions/thylint@master
+    - uses: seL4/ci-actions/thylint@thylint-diff
     - uses: yuzutech/annotations-action@v0.2.1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
