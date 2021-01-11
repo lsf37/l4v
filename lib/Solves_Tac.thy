@@ -67,6 +67,7 @@ method_setup solves = "
   Scan.succeed (SIMPLE_METHOD' o solves_tac)
 " "find a previously proven fact that solves the goal"
 
+print_theorems
 
 lemma "(A = B) = (B = A)"
   apply solves
