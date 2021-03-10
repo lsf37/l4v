@@ -6,7 +6,7 @@
 
 theory Dpolicy
 imports
-  "Access.Access"
+  "Access.ArchAccess_AC"
   "DRefine.Refine_D"
   "DBaseRefine.Include_D"
 begin
@@ -42,10 +42,10 @@ where
     | cdl_cap.TcbCap obj_ref \<Rightarrow> {Control}
     | cdl_cap.DomainCap \<Rightarrow> {Control}
     | cdl_cap.PendingSyncSendCap oref badge call grant grant_reply fault \<Rightarrow>
-          {SyncSend} \<union> (if grant then {Access.Grant, Call} else {})
+          {SyncSend} \<union> (if grant then {Types.Grant, Call} else {})
           \<union> (if grant_reply then {Call} else {})
     | cdl_cap.PendingSyncRecvCap oref fault grant \<Rightarrow>
-          (if fault then {} else {Receive}) \<union> (if grant then {Access.Grant} else {})
+          (if fault then {} else {Receive}) \<union> (if grant then {Types.Grant} else {})
     | cdl_cap.PendingNtfnRecvCap oref \<Rightarrow> {Receive}
     | cdl_cap.RestartCap \<Rightarrow> {}
     | cdl_cap.IrqControlCap \<Rightarrow> {Control}
@@ -161,7 +161,7 @@ where
                                  cdl_state_asids_to_policy_aux aag caps asid_tab"
   | csata_asidpool: "\<lbrakk> asid_tab (fst (transform_asid asid)) = Some poolcap;
                        \<not> is_null_cap poolcap; asid \<noteq> 0 \<rbrakk> \<Longrightarrow>
-                  (pasObjectAbs aag (cap_object poolcap), ASIDPoolMapsASID, pasASIDAbs aag asid) \<in>
+                  (pasObjectAbs aag (cap_object poolcap), AAuth ASIDPoolMapsASID, pasASIDAbs aag asid) \<in>
                               cdl_state_asids_to_policy_aux aag caps asid_tab"
 
 abbreviation
@@ -435,8 +435,8 @@ lemma untyped_range_transform:
 lemma cap_auth_conferred_transform:
   "cap_auth_conferred cap = cdl_cap_auth_conferred (transform_cap cap)"
   apply (case_tac cap;
-         clarsimp simp: cap_auth_conferred_def cdl_cap_auth_conferred_def
-                        reply_cap_rights_to_auth_def)
+         clarsimp simp: cap_auth_conferred_def arch_cap_auth_conferred_def
+                        cdl_cap_auth_conferred_def reply_cap_rights_to_auth_def)
   apply (rename_tac arch_cap)
   apply (case_tac arch_cap; clarsimp simp: is_page_cap_def)
   done
@@ -655,7 +655,7 @@ lemma pde_cdl_cap_auth_conferred:
   done
 
 lemma state_vrefs_transform:
-  "\<lbrakk> invs s; ptr \<noteq> idle_thread s; (ptr', ref, auth) \<in> state_vrefs s ptr \<rbrakk> \<Longrightarrow>
+  "\<lbrakk> invs s; ptr \<noteq> idle_thread s; (ptr', ref, aat, auth) \<in> state_vrefs s ptr \<rbrakk> \<Longrightarrow>
      (ptr, auth, ptr') \<in> cdl_state_objs_to_policy (transform s)"
   apply (simp add:state_vrefs_def, case_tac "kheap s ptr", simp+)
   apply (case_tac a, simp_all add:vs_refs_no_global_pts_def)
@@ -712,7 +712,7 @@ lemma pde_ref_transform_rev:
 lemma state_vrefs_transform_rev:
   "\<lbrakk> einvs s; opt_cap ptr (transform s) = Some cap; ptr' \<in> cdl_obj_refs cap;
      auth \<in> cdl_cap_auth_conferred cap; \<not> is_real_cap cap \<rbrakk> \<Longrightarrow>
-     \<exists>ref. (ptr', ref, auth) \<in> state_vrefs s (fst ptr)"
+     \<exists>ref aat. (ptr', ref, aat, auth) \<in> state_vrefs s (fst ptr)"
   apply (case_tac ptr, clarsimp)
   apply (subgoal_tac "a \<noteq> idle_thread s")
    prefer 2
@@ -740,9 +740,7 @@ lemma state_vrefs_transform_rev:
     apply (rename_tac "fun")
     apply (case_tac "fun (of_nat b)")
      apply (clarsimp simp:transform_asid_pool_entry_def)
-    apply (rule_tac x="(of_nat b, ptr')" in image_eqI)
-     apply (clarsimp simp:transform_asid_pool_entry_def cdl_cap_auth_conferred_def)
-     apply simp
+     apply (fastforce simp:transform_asid_pool_entry_def cdl_cap_auth_conferred_def)
     apply (clarsimp simp:transform_asid_pool_entry_def)
    apply (clarsimp simp:transform_page_table_contents_def unat_map_def split:if_split_asm)
    apply (rule exI)+
@@ -761,13 +759,7 @@ lemma state_vrefs_transform_rev:
   apply (simp add:kernel_pde_mask_def not_less[symmetric])
   apply (rule exI)
   apply (drule pde_ref_transform_rev, clarsimp)
-  apply (rule bexI)
-   prefer 2
-   apply fastforce
-  apply clarsimp
-  apply (rule_tac x="(ptr', auth)" in image_eqI)
-   apply simp
-  apply simp
+  apply fastforce
   done
 
 lemma cdl_cdt_transform_rev:
@@ -825,7 +817,7 @@ lemma cdl_transferable_implies_transferable:
      apply fastforce
     apply (blast dest: idle_thread_null_cap)
    apply (fastforce dest: cdl_transform_null_cap[rotated])
-  apply (fastforce dest: cdl_transform_reply_cap[rotated])
+  apply (fastforce simp: is_transferable.simps dest: cdl_transform_reply_cap[rotated])
   done
 
 lemma state_objs_transform:
@@ -960,8 +952,7 @@ lemma state_objs_transform_rev:
   done
 
 lemma state_vrefs_asidpool_control:
- "(pdptr, VSRef asid (Some AASIDPool), auth) \<in>
-                                state_vrefs s poolptr \<Longrightarrow> auth = Control"
+  "(pdptr, asid, AASIDPool, auth) \<in> state_vrefs s poolptr \<Longrightarrow> auth = Control"
   apply (clarsimp simp:state_vrefs_def )
   apply (cases "kheap s poolptr")
    apply clarsimp
@@ -1082,7 +1073,7 @@ lemma state_vrefs_asid_pool_transform_rev:
   "\<lbrakk> einvs s; cdl_asid_table (transform s) (fst (transform_asid asid)) = Some poolcap;
      \<not> is_null_cap poolcap; \<not> is_null_cap pdcap; pdptr = cap_object pdcap;
      opt_cap (cap_object poolcap, snd (transform_asid asid)) (transform s) = Some pdcap \<rbrakk> \<Longrightarrow>
-     (pdptr, VSRef (asid && mask ARM_A.asid_low_bits) (Some AASIDPool), Control)
+     (pdptr, asid && mask ARM_A.asid_low_bits, AASIDPool, Control)
           \<in> state_vrefs s (cap_object poolcap)"
   apply (subgoal_tac "cap_object poolcap \<noteq> idle_thread s")
    prefer 2
