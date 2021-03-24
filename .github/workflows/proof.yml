@@ -27,7 +27,7 @@ jobs:
         key: ${{ runner.os }}-stack-${{ github.sha }}
         restore-keys: ${{ runner.os }}-stack-
     - run: |
-        ls -al /github/home/
+        ls -al /home/runner/work/_temp/_github_home
         df
     - name: compile Haskell
       uses: seL4/ci-actions/run-proofs@master
