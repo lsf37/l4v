@@ -9,11 +9,11 @@ on:
     branches:
       - master
       - rt
-  pull_request:
+  pull_request_target:
 
 jobs:
   aspec:
-    name: ASpec
+    name: HaskellKernel
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -25,6 +25,7 @@ jobs:
       with:
         L4V_ARCH: ${{ matrix.arch }}
         isa_branch: ts-2020
+        session: HaskellKernel
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
