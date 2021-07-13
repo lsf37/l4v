@@ -18,14 +18,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ARM, ARM_HYP, X64, RISCV64]
+        arch: [ARM]
     steps:
     - name: Proofs
       uses: seL4/ci-actions/aws-proofs@aws-proofs
       with:
         L4V_ARCH: ${{ matrix.arch }}
         isa_branch: ts-2020
-        session: HaskellKernel, Lib
+        session: ASpec
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
