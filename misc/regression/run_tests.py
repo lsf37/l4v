@@ -46,11 +46,12 @@ ANSI_YELLOW = "\033[33m"
 ANSI_WHITE = "\033[37m"
 ANSI_BOLD = "\033[1m"
 
-force_colour = True
+def running_on_github():
+    return os.environ.get("GITHUB_REPOSITORY") != None
 
-def output_color(color, s):
+def output_color(color, s, github = running_on_github()):
     """Wrap the given string in the given color."""
-    if sys.stdout.isatty() or force_colour:
+    if sys.stdout.isatty() or github:
         return color + s + ANSI_RESET
     return s
 
@@ -479,7 +480,7 @@ def main():
 
     force_colour = args.colour
 
-    github = os.environ.get("GITHUB_REPOSITORY") != None
+    github = running_on_github()
 
     # Search for test files:
     test_xml = sorted(rglob(args.directory, "tests.xml"))
@@ -545,6 +546,7 @@ def main():
     if bad_names:
         sys.stderr.write("Warning: These tests are excluded/removed, but do not exist: %s\n" %
                          (", ".join(sorted(bad_names))))
+        sys.stderr.flush()
 
     if args.dry_run:
         if args.dot:
