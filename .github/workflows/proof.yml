@@ -30,6 +30,7 @@ jobs:
         isa_branch: ts-2020
         session: Lib
       env:
+        GH_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_SSH: ${{ secrets.AWS_SSH }}
