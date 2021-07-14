@@ -20,8 +20,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ARM, ARM_HYP, RISCV64, X64]
+        arch: [RISCV64]
     steps:
+    - run: printenv
     - name: Proofs
       uses: seL4/ci-actions/aws-proofs@aws-ssh
       with:
