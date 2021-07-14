@@ -24,7 +24,7 @@ jobs:
     steps:
     - run: printenv
     - name: Proofs
-      uses: seL4/ci-actions/aws-proofs@aws-ssh
+      uses: seL4/ci-actions/aws-proofs@master
       with:
         L4V_ARCH: ${{ matrix.arch }}
         isa_branch: ts-2020
