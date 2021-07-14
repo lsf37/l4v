@@ -23,7 +23,7 @@ jobs:
         arch: [ARM, ARM_HYP, RISCV64, X64]
     steps:
     - name: Proofs
-      uses: seL4/ci-actions/aws-proofs@master
+      uses: seL4/ci-actions/aws-proofs@aws-ssh
       with:
         L4V_ARCH: ${{ matrix.arch }}
         isa_branch: ts-2020
