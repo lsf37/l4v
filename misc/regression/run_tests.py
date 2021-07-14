@@ -46,10 +46,11 @@ ANSI_YELLOW = "\033[33m"
 ANSI_WHITE = "\033[37m"
 ANSI_BOLD = "\033[1m"
 
+force_colour = True
 
 def output_color(color, s):
     """Wrap the given string in the given color."""
-    if sys.stdout.isatty():
+    if sys.stdout.isatty() or force_colour:
         return color + s + ANSI_RESET
     return s
 
@@ -176,6 +177,7 @@ def run_test(test, status_queue, kill_switch,
         else:
             path = ""
         print("    command: %s%s" % (test.command, path))
+        sys.stdout.flush()
 
     # Determine where stdout should go. We can't print it live to stdout and
     # also capture it, unfortunately.
@@ -194,6 +196,7 @@ def run_test(test, status_queue, kill_switch,
         output = "Exception while running test:\n\n%s" % (traceback.format_exc())
         if verbose:
             print(output)
+            sys.stdout.flush()
         status_queue.put({'name': test.name,
                           'status': ERROR,
                           'output': output,
@@ -320,6 +323,7 @@ def run_test(test, status_queue, kill_switch,
 
     if verbose and github:
         print("::endgroup::")
+        sys.stdout.flush()
 
     status_queue.put({'name': test.name,
                       'status': test_status[0],
@@ -460,6 +464,8 @@ def main():
                                   help="do not enforce any test timeouts")
     parser.add_argument("--grace-period", type=float, default=5, metavar='N',
                         help="interrupt over-time processes N seconds before killing them (default: 5)")
+    parser.add_argument("--colour", action="store_true",
+                        help="force colour output, even if not on a tty")
     parser.add_argument("tests", metavar="TESTS",
                         help="select these tests to run (defaults to all tests)",
                         nargs="*")
@@ -470,6 +476,8 @@ def main():
 
     if args.scale_timeouts <= 0:
         parser.error("--scale-timeouts value must be greater than 0")
+
+    force_colour = args.colour
 
     github = os.environ.get("GITHUB_REPOSITORY") != None
 
