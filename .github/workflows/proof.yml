@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [RISCV64]
+        arch: [RISCV64, X64]
     steps:
     - run: printenv
     - name: Proofs
@@ -28,7 +28,7 @@ jobs:
       with:
         L4V_ARCH: ${{ matrix.arch }}
         isa_branch: ts-2020
-        session: Lib
+        session: Lib ${{ if contains(['X64', 'ARM_HYP'], matrix.arch) then '' else 'SimplExportAndRefine' }}
       env:
         GH_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
