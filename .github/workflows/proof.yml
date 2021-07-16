@@ -36,7 +36,7 @@ jobs:
       with:
         L4V_ARCH: ${{ matrix.arch }}
         isa_branch: ts-2020
-        session: ${{ matric.session }}
+        session: ${{ matrix.session }}
       env:
         GH_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
