@@ -15,4 +15,5 @@ jobs:
     - uses: actions/checkout@v2
       with:
         repository: seL4/ci-actions
+        ref: refs/heads/simul-pr
     - run: scripts/get-prs
