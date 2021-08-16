@@ -16,4 +16,5 @@ jobs:
       with:
         repository: seL4/ci-actions
         ref: refs/heads/simul-pr
+    - run: pip3 install -U PyGithub
     - run: scripts/get-prs
