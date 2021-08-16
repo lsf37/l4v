@@ -16,5 +16,20 @@ jobs:
       with:
         repository: seL4/ci-actions
         ref: refs/heads/simul-pr
+        path: ci-actions
     - run: pip3 install -U PyGithub
-    - run: scripts/get-prs
+    - run: ci-actions/scripts/get-prs
+    - run: |
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ci-actions/scripts/repo
+        chmod a+x ci-actions/scripts/repo
+        export PATH=$(pwd)/ci-actions/scripts:${PATH}
+        INPUT_EXTRA_PRS="$(get-prs)"
+        mkdir ver
+        cd ver
+        checkout-manifest.sh
+        echo "cd $(repo-util path ${GITHUB_REPOSITORY})"
+        cd $(repo-util path ${GITHUB_REPOSITORY})
+        fetch-branch.sh
+        cd - >/dev/null
+        fetch-extra-prs.sh
+        repo-util hashes
