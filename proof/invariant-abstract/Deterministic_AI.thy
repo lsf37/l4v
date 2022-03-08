@@ -5,7 +5,7 @@
  *)
 
 theory Deterministic_AI
-imports ArchVCPU_AI
+imports AInvs
 begin
 
 context begin interpretation Arch .
