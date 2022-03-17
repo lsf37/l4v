@@ -560,12 +560,6 @@ crunches set_mcpriority, set_priority
   for state_hyp_refs_of[wp]: "\<lambda>s. P (state_hyp_refs_of s)"
   (wp: thread_set_hyp_refs_trivial simp: set_priority_def thread_set_priority_def)
 
-method hoare_skip uses wp simp =
-  (rule hoare_seq_ext_skip, solves \<open>wpsimp wp: wp simp: simp\<close>
-   | rule hoare_seq_ext_skipE, solves \<open>wpsimp wp: wp simp: simp\<close>)
-   | rule validE_valid, rule hoare_seq_ext_skipE, solves \<open>wpsimp wp: wp simp: simp\<close>, rule valid_validE,
-  clarsimp?
-
 lemma invoke_tcb_valid_cur_vcpu[wp]:
   "\<lbrace>\<lambda>s. valid_cur_vcpu s \<and> sym_refs (state_hyp_refs_of s)\<rbrace>
    invoke_tcb iv
@@ -575,7 +569,7 @@ lemma invoke_tcb_valid_cur_vcpu[wp]:
    subgoal for tcb_ptr ntfn_ptr_opt
      by (case_tac ntfn_ptr_opt; wpsimp)
   \<comment> \<open>ThreadControl\<close>
-  apply (hoare_skip wp: check_cap_inv)+
+  apply (forward_inv_step wp: check_cap_inv)+
   by (wpsimp wp: check_cap_inv hoare_drop_imps thread_set_hyp_refs_trivial thread_set_valid_cur_vcpu)
 
 crunches invoke_domain
