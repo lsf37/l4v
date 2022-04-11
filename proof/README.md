@@ -5,7 +5,6 @@
 -->
 
 Formal Proofs about seL4
-========================
 
 This directory contains the formal proofs about seL4, which mostly prove
 properties about the various seL4 [specifications](../spec/).
