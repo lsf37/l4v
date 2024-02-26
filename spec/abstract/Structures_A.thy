@@ -4,10 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-only
  *)
 
-(*
-The main architecture independent data types and type definitions in
-the abstract model.
-*)
+(* The main architecture independent data types and type definitions in
+   the abstract model. *)
 
 chapter "Basic Data Structures"
 
