@@ -7,7 +7,7 @@
 theory
   InitVSpace_SI
 imports
-  "DSpecProofs.Invocation_DP"
+  DSpecProofs.Invocation_DP
   "DSpecProofs.Arch_DP"
   ObjectInitialised_SI
   RootTask_SI
